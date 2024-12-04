@@ -4,9 +4,10 @@
       <p [class]="'from-' + (entry.nickname === nickname ? 'me' : 'them')" >
         <span>{{ entry.nickname }}</span><br>
         {{ entry.message }}
+        <span>{{ entry.sentAt | date:'dd.MM.yyyy, HH:mm' }}</span><br>
       </p>
     </ng-container>
 
-    <input type="text" style="margin-top: 50px;">
+    <input type="text" (keyup.enter)="sendNewMessage($event)" style="margin-top: 50px;">
   </div>
 </div>

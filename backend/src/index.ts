@@ -2,13 +2,17 @@ import http from 'http';
 import express from 'express';
 import cors from 'cors';
 import { createHmac } from 'crypto';
-
 import environment from '../environment/environment.json';
+import { FileIO, FileService } from './fileIO';
 
 const app = express();
-
+const fileIO = new FileService(); 
 app.use(cors());
-
+/**
+ * TOM SATTLER:
+ * Added use express.json() to parse Bodies
+ */
+app.use(express.json());
 /**
  * /messages:
  *   get:
@@ -16,7 +20,11 @@ app.use(cors());
  *     description: Retrieve a list of messages from the local database file.
 */
 app.get('/messages', (_: express.Request, response: express.Response) => {
-  // ... YOUR IMPLEMENTATION ...
+  const items = fileIO.readFromFile();
+  if(!items){
+    response.sendStatus(404);
+  }
+  response.status(200).send(items);
 });
 
 /**
@@ -39,7 +47,13 @@ app.post('/messages', (request: express.Request, response: express.Response) => 
   }
 
   // ... YOUR IMPLEMENTATION ...
+  if (!request.body || !request.body.nickname || !request.body.message || !request.body.sentAt) {
+    return response.status(400).json({ error: "Ungültige Nachricht" });
+  }
 
+  if(!fileIO.writeToFile(request.body)){
+    response.sendStatus(400);
+  }
   response.sendStatus(201);
 });
 
